@@ -6,7 +6,7 @@ const { Environment } = require("@azure/ms-rest-azure-env");
 async function doCleanup(client, secret, subsId, subsName, tenant, ttl) {
 
     let cred = await msRestNodeAuth.loginWithServicePrincipalSecret(client, secret, tenant, {
-      environment: Environment.AzureCloud
+      environment: Environment[process.env.AZURE_ENVIRONMENT] || Environment.AzureCloud
     });
     // do a subscription check first, to ensure resources doesn't get cleaned up by accident
     let subscriptionClient = new armSubscriptions.SubscriptionClient(cred);
@@ -88,10 +88,10 @@ async function doCleanup(client, secret, subsId, subsName, tenant, ttl) {
     console.log(`  Resource group failed to delete: ${stats.toDeleteGroups - stats.deletedGroups}`);
 }
 
-const clientId = '***';
-const clientSecret = '***';
-const subscriptionId = '***';
-const subscriptionName = '***';
-const tenantId = '***';
+const clientId = process.env.CLIENT_ID;
+const clientSecret = process.env.CLIENT_SECRET;
+const subscriptionId = process.env.SUBSCRIPTION_ID;
+const subscriptionName = process.env.SUBSCRIPTION_NAME;
+const tenantId = process.env.TENANT_ID;
 const TTL = 7;
 doCleanup(clientId, clientSecret, subscriptionId, subscriptionName, tenantId, TTL).catch(console.log);
