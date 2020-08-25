@@ -4,7 +4,9 @@ const armSubscriptions = require('@azure/arm-subscriptions');
 const { daysAgo, deleteResourceById, listResources, listResourcesOnResourceGroup, listResourceGroups } = require("./utils");
 const { Environment } = require("@azure/ms-rest-azure-env");
 async function doCleanup(client, secret, subsId, subsName, tenant, ttl) {
-
+    if (!client) {
+        throw new Error("Missing client id!");
+    }
     let cred = await msRestNodeAuth.loginWithServicePrincipalSecret(client, secret, tenant, {
       environment: Environment[process.env.AZURE_ENVIRONMENT] || Environment.AzureCloud
     });
@@ -94,4 +96,7 @@ const subscriptionId = process.env.SUBSCRIPTION_ID;
 const subscriptionName = process.env.SUBSCRIPTION_NAME;
 const tenantId = process.env.TENANT_ID;
 const TTL = 7;
-doCleanup(clientId, clientSecret, subscriptionId, subscriptionName, tenantId, TTL).catch(console.log);
+doCleanup(clientId, clientSecret, subscriptionId, subscriptionName, tenantId, TTL).catch(e=> {
+    console.log(e);
+    throw e;
+});
